@@ -66,71 +66,89 @@ class _PetListPageState extends State<PetListPage> {
         title: const Text("Pet List"),
         backgroundColor: Colors.orangeAccent,
       ),
-      body: ListView.builder(
-        itemCount: pets.length,
-        itemBuilder: (context, index) {
-          final pet = pets[index];
-
-          return Card(
-            child: ListTile(
-              // 🔥 CLICK → DETAIL
-              onTap: () async {
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => PetDetailPage(pet: pet)),
-                );
-
-                if (result == true) {
-                  loadPets(); // 🔥 reload khi quay về
-                }
-              },
-
-              leading: pet.image.isNotEmpty
-                  ? CircleAvatar(
-                      radius: 25,
-                      backgroundImage: NetworkImage(pet.image),
-                    )
-                  : CircleAvatar(
-                      radius: 25,
-                      backgroundColor: Colors.orange.shade100,
-                      child: const Icon(
-                        Icons.pets,
-                        color: Colors.orange,
-                        size: 28,
-                      ),
-                    ),
-
-              title: Text(pet.name),
-              subtitle: Text("${pet.type} - ${pet.breed}"),
-
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
+      body: pets.isEmpty
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // EDIT
-                  IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () async {
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => EditPetPage(pet: pet),
-                        ),
-                      );
-                      loadPets();
-                    },
+                  Icon(Icons.pets, size: 80, color: Colors.grey.shade400),
+                  const SizedBox(height: 15),
+                  const Text(
+                    "Chưa có thú cưng nào",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey,
+                    ),
                   ),
-
-                  // DELETE
-                  IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () => deletePet(pet.id!),
+                  const SizedBox(height: 5),
+                  const Text(
+                    "Hãy thêm thú cưng mới 🐶🐱",
+                    style: TextStyle(color: Colors.grey),
                   ),
                 ],
               ),
+            )
+          : ListView.builder(
+              itemCount: pets.length,
+              itemBuilder: (context, index) {
+                final pet = pets[index];
+
+                return Card(
+                  child: ListTile(
+                    onTap: () async {
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => PetDetailPage(pet: pet),
+                        ),
+                      );
+
+                      if (result == true) {
+                        loadPets();
+                      }
+                    },
+                    leading: pet.image.isNotEmpty
+                        ? CircleAvatar(
+                            radius: 25,
+                            backgroundImage: NetworkImage(pet.image),
+                          )
+                        : CircleAvatar(
+                            radius: 25,
+                            backgroundColor: Colors.orange.shade100,
+                            child: const Icon(
+                              Icons.pets,
+                              color: Colors.orange,
+                              size: 28,
+                            ),
+                          ),
+                    title: Text(pet.name),
+                    subtitle: Text("${pet.type} - ${pet.breed}"),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.edit),
+                          onPressed: () async {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => EditPetPage(pet: pet),
+                              ),
+                            );
+                            loadPets();
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () => deletePet(pet.id!),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
-          );
-        },
-      ),
 
       // ADD
       floatingActionButton: FloatingActionButton(
