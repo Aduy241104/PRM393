@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:project/authProvider.dart'; // Kiểm tra lại path project của bạn
 import 'user_profile_page.dart';
+import 'vaccine_management_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -49,6 +50,20 @@ class HomePage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             const Text("Chúc bạn một ngày tuyệt vời bên thú cưng!"),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () {
+                final userId = auth.user?.id;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => VaccineManagementPage(userId: userId),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.vaccines),
+              label: const Text('Vaccine Management'),
+            ),
           ],
         ),
       ),
