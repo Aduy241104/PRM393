@@ -14,7 +14,7 @@ class OwnerDetailPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text("Chi Tiết Chủ Sở Hữu"),
+        title: const Text("Hồ sơ Chủ Sở Hữu"),
         centerTitle: true,
         backgroundColor: Colors.orangeAccent,
         elevation: 0,

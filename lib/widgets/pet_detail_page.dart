@@ -14,7 +14,7 @@ class PetDetailPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(pet.name),
+        title: const Text("Hồ sơ thú cưng"),
         backgroundColor: Colors.orangeAccent,
       ),
       body: Padding(
@@ -70,13 +70,11 @@ class PetDetailPage extends StatelessWidget {
                           content: const Text("Bạn có chắc muốn xóa?"),
                           actions: [
                             TextButton(
-                              onPressed: () =>
-                                  Navigator.pop(context, false),
+                              onPressed: () => Navigator.pop(context, false),
                               child: const Text("Hủy"),
                             ),
                             TextButton(
-                              onPressed: () =>
-                                  Navigator.pop(context, true),
+                              onPressed: () => Navigator.pop(context, true),
                               child: const Text("Xóa"),
                             ),
                           ],

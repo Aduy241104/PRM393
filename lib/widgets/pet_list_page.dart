@@ -63,7 +63,7 @@ class _PetListPageState extends State<PetListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Pet List"),
+        title: const Text("Danh Sách Thú Cưng"),
         backgroundColor: Colors.orangeAccent,
       ),
       body: pets.isEmpty

@@ -39,7 +39,7 @@ class _AddPetPageState extends State<AddPetPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Add Pet"),
+        title: const Text("Thêm thú cưng"),
         backgroundColor: Colors.orangeAccent,
       ),
       body: Padding(

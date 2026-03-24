@@ -53,7 +53,7 @@ class _EditPetPageState extends State<EditPetPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Edit Pet"),
+        title: const Text("Chỉnh sửa thông tin thú cưng"),
         backgroundColor: Colors.orangeAccent,
       ),
       body: Padding(
