@@ -9,6 +9,7 @@ import '../models/owner.dart';
 import '../database/owner_service.dart';
 import '../widgets/owner_item.dart';
 import '../widgets/detail_owner_page.dart'; // trang Detail mới
+import '../widgets/serviceManagement/service_list_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -117,6 +118,29 @@ class _HomePageState extends State<HomePage> {
               );
             },
           ),
+          IconButton(
+            icon: const Icon(Icons.medical_services),
+            tooltip: 'Quản lý dịch vụ',
+            onPressed: () {
+              // ví dụ: lấy petId đầu tiên của owner để mở ServiceListScreen
+              if (owners.isNotEmpty) {
+                final petId = owners.first.id!;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ServiceListScreen(petId: petId),
+                  ),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("Chưa có thú cưng để quản lý dịch vụ"),
+                  ),
+                );
+              }
+            },
+          ),
+
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Đăng xuất',
