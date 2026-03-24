@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project/widgets/pet_list_page.dart';
 import 'package:provider/provider.dart';
 import 'package:project/authProvider.dart'; // Kiểm tra lại path project của bạn
 import 'user_profile_page.dart';
@@ -49,6 +50,24 @@ class HomePage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             const Text("Chúc bạn một ngày tuyệt vời bên thú cưng!"),
+
+            const SizedBox(height: 20),
+
+            ElevatedButton.icon(
+              icon: const Icon(Icons.pets),
+              label: const Text("Xem danh sách thú cưng"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orangeAccent,
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const PetListPage(ownerId: 1),
+                  ),
+                );
+              },
+            ),
           ],
         ),
       ),
