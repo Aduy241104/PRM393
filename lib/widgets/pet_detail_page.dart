@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/pet.dart';
 import '../database/pet_service.dart';
 import 'edit_pet_page.dart';
+import 'medical_record_list_page.dart';
 
 class PetDetailPage extends StatelessWidget {
   final Pet pet;
@@ -57,6 +58,27 @@ class PetDetailPage extends StatelessWidget {
             const Divider(),
             const SizedBox(height: 20),
 
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => MedicalRecordListPage(pet: pet),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.medical_information_outlined),
+                label: const Text("Quản lý hồ sơ khám bệnh"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orangeAccent,
+                  foregroundColor: Colors.white,
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+
             Row(
               children: [
                 // DELETE
@@ -90,7 +112,7 @@ class PetDetailPage extends StatelessWidget {
                       backgroundColor: Colors.orangeAccent,
                       foregroundColor: Colors.white,
                     ),
-                    child: const Text("Delete"),
+                    child: const Text("Xóa thú cưng"),
                   ),
                 ),
 
@@ -112,7 +134,7 @@ class PetDetailPage extends StatelessWidget {
                       backgroundColor: Colors.orangeAccent,
                       foregroundColor: Colors.white,
                     ),
-                    child: const Text("Edit"),
+                    child: const Text("Sửa thông tin"),
                   ),
                 ),
               ],
