@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:project/authProvider.dart';
 import '../widgets/add_owner_page.dart';
 import 'user_profile_page.dart';
+import 'vaccineManagement/vaccine_management_page.dart';
 import '../models/owner.dart';
 import '../database/owner_service.dart';
 import '../widgets/owner_item.dart';
@@ -41,48 +42,46 @@ class _HomePageState extends State<HomePage> {
     if (userId != null) {
       Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (_) => AddOwnerPage(userId: userId),
-        ),
+        MaterialPageRoute(builder: (_) => AddOwnerPage(userId: userId)),
       ).then((_) => loadOwners());
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("User chưa có ID!")),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("User chưa có ID!")));
     }
   }
 
   void deleteOwner(int id) async {
     await service.delete(id);
     loadOwners();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Xóa chủ sở hữu thành công")),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text("Xóa chủ sở hữu thành công")));
   }
 
   void confirmDeleteOwner(int id) {
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: const Text("Xác nhận xóa"),
-      content: const Text("Bạn có chắc muốn xóa chủ sở hữu này không?"),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text("Hủy"),
-        ),
-        ElevatedButton(
-          // Không set màu nữa, dùng mặc định
-          onPressed: () {
-            Navigator.pop(context);
-            deleteOwner(id);
-          },
-          child: const Text("Xóa"),
-        ),
-      ],
-    ),
-  );
-}
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Xác nhận xóa"),
+        content: const Text("Bạn có chắc muốn xóa chủ sở hữu này không?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Hủy"),
+          ),
+          ElevatedButton(
+            // Không set màu nữa, dùng mặc định
+            onPressed: () {
+              Navigator.pop(context);
+              deleteOwner(id);
+            },
+            child: const Text("Xóa"),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -101,6 +100,19 @@ class _HomePageState extends State<HomePage> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => const UserProfilePage(),
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.vaccines),
+            tooltip: 'Quản lý vaccine',
+            onPressed: () {
+              final userId = auth.user?.id;
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => VaccineManagementPage(userId: userId),
                 ),
               );
             },
@@ -132,7 +144,9 @@ class _HomePageState extends State<HomePage> {
                   Text(
                     "Chào mừng, ${auth.user?.username ?? 'User'}!",
                     style: const TextStyle(
-                        fontSize: 22, fontWeight: FontWeight.bold),
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 10),
                   const Text("Chúc bạn một ngày tuyệt vời bên thú cưng!"),
@@ -149,11 +163,13 @@ class _HomePageState extends State<HomePage> {
                   onDelete: () => confirmDeleteOwner(owner.id!),
                   onUpdate: (updatedOwner) {
                     setState(() {
-                      final idx = owners.indexWhere((o) => o.id == updatedOwner.id);
+                      final idx = owners.indexWhere(
+                        (o) => o.id == updatedOwner.id,
+                      );
                       if (idx != -1) owners[idx] = updatedOwner;
                     });
                   },
-                 onTap: () async {
+                  onTap: () async {
                     final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
