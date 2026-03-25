@@ -156,7 +156,7 @@ class _VaccineManagementPageState extends State<VaccineManagementPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Vaccine List'),
-        backgroundColor: Colors.teal,
+        backgroundColor: Colors.orangeAccent,
         actions: [
           IconButton(
             icon: const Icon(Icons.add),

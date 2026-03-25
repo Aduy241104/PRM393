@@ -173,7 +173,7 @@ class _VaccineFormPageState extends State<VaccineFormPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_isEdit ? 'Edit Vaccine' : 'Add Vaccine'),
-        backgroundColor: Colors.teal,
+        backgroundColor: Colors.orangeAccent,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
