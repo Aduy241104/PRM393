@@ -3,7 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:project/authProvider.dart';
 import 'package:project/database/auth_service.dart';
 import 'package:project/models/user.dart';
-import 'edit_profile_page.dart'; // Import trang edit của bạn
+import 'package:project/widgets/change_password_page.dart';
+import 'edit_profile_page.dart';
 
 class UserProfilePage extends StatefulWidget {
   const UserProfilePage({super.key});
@@ -15,9 +16,12 @@ class UserProfilePage extends StatefulWidget {
 class _UserProfilePageState extends State<UserProfilePage> {
   final AuthService authService = AuthService();
 
-  // Hàm này giúp FutureBuilder thực thi lại
-  void _refreshData() {
-    setState(() {});
+  // Hàm điều hướng và tự động refresh khi quay lại
+  void _navigateTo(Widget page) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => page),
+    ).then((_) => setState(() {})); // Gọi setState để FutureBuilder chạy lại
   }
 
   @override
@@ -32,44 +36,21 @@ class _UserProfilePageState extends State<UserProfilePage> {
         elevation: 0,
         backgroundColor: Colors.orangeAccent,
         foregroundColor: Colors.white,
-        actions: [
-          // NÚT QUA TRANG EDIT
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () {
-              // Lấy dữ liệu hiện tại để truyền sang trang Edit
-              authService.getUserById(userId ?? 0).then((user) {
-                if (user != null) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => EditProfilePage(user: user),
-                    ),
-                  ).then((_) {
-                    // KHI QUAY LẠI TỪ TRANG EDIT, LOAD LẠI DATA
-                    _refreshData();
-                  });
-                }
-              });
-            },
-          ),
-        ],
       ),
       body: FutureBuilder<User?>(
-        // Future này sẽ chạy lại mỗi khi _refreshData (setState) được gọi
         future: authService.getUserById(userId ?? 0),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (!snapshot.hasData || snapshot.data == null) {
-            return const Center(child: Text("Không tìm thấy dữ liệu"));
-          }
+          if (!snapshot.hasData)
+            return const Center(child: Text("Lỗi tải dữ liệu"));
 
           final user = snapshot.data!;
           return SingleChildScrollView(
             child: Column(
               children: [
+                // Header Profile
                 Container(
                   width: double.infinity,
                   decoration: const BoxDecoration(
@@ -94,34 +75,44 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       Text(
                         user.username.toUpperCase(),
                         style: const TextStyle(
-                          fontSize: 24,
+                          fontSize: 22,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
-                          letterSpacing: 1.2,
                         ),
                       ),
                     ],
                   ),
                 ),
+
+                // Danh sách thông tin
                 Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: Column(
                     children: [
-                      _buildInfoItem(Icons.email_rounded, "Email", user.email),
+                      _buildInfoItem(Icons.email, "Email", user.email),
+                      _buildInfoItem(Icons.phone, "Số điện thoại", user.phone),
                       _buildInfoItem(
-                        Icons.phone_rounded,
-                        "Số điện thoại",
-                        user.phone,
-                      ),
-                      _buildInfoItem(
-                        Icons.location_on_rounded,
+                        Icons.location_on,
                         "Địa chỉ",
                         user.address,
                       ),
-                      _buildInfoItem(
-                        Icons.calendar_today_rounded,
-                        "Ngày tham gia",
-                        user.createdAt.split(' ')[0],
+
+                      const SizedBox(height: 10),
+                      const Divider(),
+                      const SizedBox(height: 10),
+
+                      // Nút Sửa hồ sơ
+                      _buildActionItem(
+                        Icons.edit,
+                        "Chỉnh sửa hồ sơ",
+                        () => _navigateTo(EditProfilePage(user: user)),
+                      ),
+
+                      // Nút Đổi mật khẩu
+                      _buildActionItem(
+                        Icons.vpn_key,
+                        "Thay đổi mật khẩu",
+                        () => _navigateTo(const ChangePasswordPage()),
                       ),
                     ],
                   ),
@@ -134,45 +125,35 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
+  // Widget hiển thị thông tin (Dạng tĩnh)
   Widget _buildInfoItem(IconData icon, String label, String value) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 15),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
+    return ListTile(
+      leading: Icon(icon, color: Colors.orangeAccent),
+      title: Text(
+        label,
+        style: const TextStyle(fontSize: 12, color: Colors.grey),
       ),
+      subtitle: Text(
+        value,
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          color: Colors.black,
+        ),
+      ),
+    );
+  }
+
+  // Widget nút chức năng (Dạng bấm được)
+  Widget _buildActionItem(IconData icon, String title, VoidCallback onTap) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 10),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: ListTile(
-        leading: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.orange[50],
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(icon, color: Colors.orangeAccent),
-        ),
-        title: Text(
-          label,
-          style: const TextStyle(
-            fontSize: 13,
-            color: Colors.grey,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        subtitle: Text(
-          value,
-          style: const TextStyle(
-            fontSize: 16,
-            color: Colors.black87,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        leading: Icon(icon, color: Colors.orangeAccent),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: onTap,
       ),
     );
   }
