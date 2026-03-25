@@ -59,4 +59,32 @@ class AuthService {
       whereArgs: [id],
     );
   }
+
+  // Thêm vào class AuthService
+  Future<int> changePassword(
+    int userId,
+    String oldPassword,
+    String newPassword,
+  ) async {
+    final dbClient = await Db.instance.db;
+
+    // 1. Kiểm tra mật khẩu cũ có khớp với database không
+    final List<Map<String, dynamic>> user = await dbClient.query(
+      'users',
+      where: 'id = ? AND password = ?',
+      whereArgs: [userId, oldPassword],
+    );
+
+    if (user.isEmpty) {
+      return -1; // Sai mật khẩu cũ
+    }
+
+    // 2. Cập nhật mật khẩu mới
+    return await dbClient.update(
+      'users',
+      {'password': newPassword},
+      where: 'id = ?',
+      whereArgs: [userId],
+    );
+  }
 }
