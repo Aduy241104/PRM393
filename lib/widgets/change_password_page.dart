@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:project/authProvider.dart';
 import 'package:project/database/auth_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ChangePasswordPage extends StatefulWidget {
   const ChangePasswordPage({super.key});
@@ -17,8 +18,8 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   final _authService = AuthService();
 
   void _handleChangePassword() async {
-    final userId = context.read<AuthProvider>().user?.id;
-
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getInt('userId'); 
     if (_oldPassC.text.isEmpty ||
         _newPassC.text.isEmpty ||
         _confirmPassC.text.isEmpty) {

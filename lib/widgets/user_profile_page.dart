@@ -14,20 +14,46 @@ class UserProfilePage extends StatefulWidget {
 }
 
 class _UserProfilePageState extends State<UserProfilePage> {
-  final AuthService authService = AuthService();
+  final AuthService _authService = AuthService();
+  late Future<User?> _userFuture; // Biến lưu giữ Future của User
 
-  // Hàm điều hướng và tự động refresh khi quay lại
-  void _navigateTo(Widget page) {
+  @override
+  void initState() {
+    super.initState();
+    // Khởi tạo Future ngay khi load trang
+    _initUserFetch();
+  }
+
+
+  // Hàm khởi tạo/làm mới việc lấy dữ liệu từ DB
+  void _initUserFetch() {
+    final userId = context.read<AuthProvider>().user?.id;
+    _userFuture = _authService.getUserById(userId ?? 0);
+  }
+
+  // Hàm làm mới giao diện (gọi sau khi Edit xong)
+  void _refreshData() {
+    setState(() {
+      _initUserFetch(); // Gán lại Future mới để FutureBuilder chạy lại
+    });
+  }
+
+  void _goToEditPage(User user) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => page),
-    ).then((_) => setState(() {})); // Gọi setState để FutureBuilder chạy lại
+      MaterialPageRoute(builder: (context) => EditProfilePage(user: user)),
+    ).then((_) => _refreshData());
+  }
+
+  void _goToChangePasswordPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ChangePasswordPage()),
+    ).then((_) => _refreshData());
   }
 
   @override
   Widget build(BuildContext context) {
-    final userId = context.read<AuthProvider>().user?.id;
-
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
@@ -38,53 +64,21 @@ class _UserProfilePageState extends State<UserProfilePage> {
         foregroundColor: Colors.white,
       ),
       body: FutureBuilder<User?>(
-        future: authService.getUserById(userId ?? 0),
+        future: _userFuture, // Sử dụng biến Future đã tách riêng
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (!snapshot.hasData)
-            return const Center(child: Text("Lỗi tải dữ liệu"));
+          if (snapshot.hasError || !snapshot.hasData || snapshot.data == null) {
+            return const Center(child: Text("Lỗi tải dữ liệu người dùng"));
+          }
 
           final user = snapshot.data!;
+
           return SingleChildScrollView(
             child: Column(
               children: [
-                // Header Profile
-                Container(
-                  width: double.infinity,
-                  decoration: const BoxDecoration(
-                    color: Colors.orangeAccent,
-                    borderRadius: BorderRadius.vertical(
-                      bottom: Radius.circular(30),
-                    ),
-                  ),
-                  padding: const EdgeInsets.only(bottom: 30),
-                  child: Column(
-                    children: [
-                      const CircleAvatar(
-                        radius: 50,
-                        backgroundColor: Colors.white,
-                        child: Icon(
-                          Icons.person,
-                          size: 65,
-                          color: Colors.orangeAccent,
-                        ),
-                      ),
-                      const SizedBox(height: 15),
-                      Text(
-                        user.username.toUpperCase(),
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Danh sách thông tin
+                _buildHeader(user.username),
                 Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: Column(
@@ -101,18 +95,15 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       const Divider(),
                       const SizedBox(height: 10),
 
-                      // Nút Sửa hồ sơ
                       _buildActionItem(
                         Icons.edit,
                         "Chỉnh sửa hồ sơ",
-                        () => _navigateTo(EditProfilePage(user: user)),
+                        () => _goToEditPage(user),
                       ),
-
-                      // Nút Đổi mật khẩu
                       _buildActionItem(
                         Icons.vpn_key,
                         "Thay đổi mật khẩu",
-                        () => _navigateTo(const ChangePasswordPage()),
+                        _goToChangePasswordPage,
                       ),
                     ],
                   ),
@@ -125,7 +116,35 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
-  // Widget hiển thị thông tin (Dạng tĩnh)
+  Widget _buildHeader(String username) {
+    return Container(
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        color: Colors.orangeAccent,
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(30)),
+      ),
+      padding: const EdgeInsets.only(bottom: 30),
+      child: Column(
+        children: [
+          const CircleAvatar(
+            radius: 50,
+            backgroundColor: Colors.white,
+            child: Icon(Icons.person, size: 65, color: Colors.orangeAccent),
+          ),
+          const SizedBox(height: 15),
+          Text(
+            username.toUpperCase(),
+            style: const TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildInfoItem(IconData icon, String label, String value) {
     return ListTile(
       leading: Icon(icon, color: Colors.orangeAccent),
@@ -135,16 +154,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
       ),
       subtitle: Text(
         value,
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-          color: Colors.black,
-        ),
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
       ),
     );
   }
 
-  // Widget nút chức năng (Dạng bấm được)
   Widget _buildActionItem(IconData icon, String title, VoidCallback onTap) {
     return Card(
       margin: const EdgeInsets.only(bottom: 10),
