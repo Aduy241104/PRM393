@@ -147,7 +147,7 @@ class Db {
 
     // ===== PET =====
     await db.insert('pets', {
-      'owner_id': 1,
+      'owner_id': 3,
       'name': 'Milo',
       'type': 'Dog',
       'breed': 'Poodle',
